@@ -1,0 +1,13 @@
+__pycache__
+*.pyc
+*.pyo
+
+Generated/*
+Activate.cmd
+Activate.ps1
+Activate.sh
+
+.coverage
+coverage.xml
+
+Tools/MSVC/v16.0.0/Windows/*

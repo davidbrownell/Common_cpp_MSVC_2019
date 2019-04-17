@@ -13,3 +13,6 @@ Activate.sh
 coverage.xml
 
 Tools/MSVC/v16.0.0/Windows/*
+Tools/Performance Tools/v16.0.0/Windows/*
+
+admin_setup.complete

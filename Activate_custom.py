@@ -18,7 +18,7 @@ import os
 import sys
 
 sys.path.insert(0, os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"))
-from RepositoryBootstrap.SetupAndActivate import CommonEnvironment, CurrentShell
+from RepositoryBootstrap.SetupAndActivate import CommonEnvironment, CurrentShell, DynamicPluginArchitecture
 from RepositoryBootstrap.Impl.ActivationActivity import ActivationActivity
 
 del sys.path[0]
@@ -69,7 +69,6 @@ def GetCustomActions(
 
     actions = []
 
-    # Verify the installed content
     if fast:
         actions.append(
             CurrentShell.Commands.Message(
@@ -127,7 +126,7 @@ def GetCustomActions(
                 "MSVC",
                 "14.20.27508",
                 "debug_nonredist",
-                os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE"),
+                configuration,
                 "Microsoft.VC141.DebugCRT",
             )
             assert os.path.isdir(debug_crt_dir), debug_crt_dir
@@ -135,6 +134,32 @@ def GetCustomActions(
             actions.append(CurrentShell.Commands.AugmentPath(debug_crt_dir))
         else:
             assert False, msvc_version
+
+        # Add the performance tools to the path
+        perf_tools_dir = ActivationActivity.GetVersionedDirectory(version_specs.Tools, _script_dir, "Tools", "Performance Tools")
+        assert os.path.isdir(perf_tools_dir), perf_tools_dir
+
+        perf_tools_dir = os.path.join(perf_tools_dir, "Team Tools", "Performance Tools")
+        if configuration == "x64":
+            perf_tools_dir = os.path.join(perf_tools_dir, "x64")
+
+        assert os.path.isdir(perf_tools_dir), perf_tools_dir
+
+        actions.append(CurrentShell.Commands.AugmentPath(perf_tools_dir))
+
+        # Update the compiler and tester info
+        actions += DynamicPluginArchitecture.CreateRegistrationStatements( "DEVELOPMENT_ENVIRONMENT_TEST_EXECUTORS",
+                                                                           os.path.join(_script_dir, "Scripts", "TestExecutors"),
+                                                                           lambda fullpath, name, ext: ext == ".py" and name.endswith("TestExecutor"),
+                                                                         )
+        
+        actions.append(
+            CurrentShell.Commands.Augment(
+                "DEVELOPMENT_ENVIRONMENT_TESTER_CONFIGURATIONS",
+                "c++-coverage_executor-MSVCCodeCoverage",
+                update_memory=True,
+            ),
+        )
 
     # Set the compiler
     if is_clang:
@@ -145,7 +170,6 @@ def GetCustomActions(
     actions += [CurrentShell.Commands.Set("CXX", compiler), CurrentShell.Commands.Set("CC", compiler)]
 
     return actions
-
 
 
 # ----------------------------------------------------------------------

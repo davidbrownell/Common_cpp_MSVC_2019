@@ -35,4 +35,14 @@ _CUSTOM_DATA                                = [
             "Windows",
         ],
     ),
+    (
+        "Visual Studio Performance Tools - 16.0.0",
+        "94470CBF0B5914BF30FF1377ED1F8F3F96098E596853B14C0A441C4513D41F93",
+        [
+            "Tools",
+            "Performance Tools",
+            "v16.0.0",
+            "Windows",
+        ],
+    ), 
 ]

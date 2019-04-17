@@ -153,6 +153,8 @@ def GetCustomActions(debug, verbose, explicit_configurations):
 
         # Reconstruct the binary
         if not os.path.isfile(install_filename):
+            remove_install_file = True
+
             actions += [
                 CurrentShell.Commands.Execute(
                     'python "{script}" Reconstruct "{filename}"'.format(
@@ -165,8 +167,9 @@ def GetCustomActions(debug, verbose, explicit_configurations):
                         filename=os.path.join(this_dir, "_Install.7z.001"),
                     ),
                 ),
-                CurrentShell.Commands.ExitOnError(),
             ]
+        else:
+            remove_install_file = False
 
         # Install the file
         actions += [
@@ -186,12 +189,17 @@ def GetCustomActions(debug, verbose, explicit_configurations):
                     dir=this_dir,
                     version=version,
                 ),
-            ),
-            CurrentShell.Commands.PersistError("_setup_error"),
-            CurrentShell.Commands.Delete(install_filename),
-            CurrentShell.Commands.ExitOnError(
-                variable_name="_setup_error",
+                exit_on_error=not remove_install_file,
             ),
         ]
+
+        if remove_install_file:
+            actions += [
+                CurrentShell.Commands.PersistError("_setup_error"),
+                CurrentShell.Commands.Delete(install_filename),
+                CurrentShell.Commands.ExitOnError(
+                    variable_name="_setup_error",
+                ),
+            ]
 
     return actions

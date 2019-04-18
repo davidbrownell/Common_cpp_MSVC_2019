@@ -98,32 +98,42 @@ def GetDependencies():
 
     d = OrderedDict()
 
-    configuration_types = [("", "x64"), ("", "x86")]
-
     if CurrentShell.CategoryName == "Windows":
+        configuration_types = [("", "x64"), ("", "x86")]
+
         # Add clang configurations (this will be in support of clang-cl (where clang
         # impersonates MSVC))
         configuration_types += [("Clang-", "x64"), ("Clang-", "x86")]
 
-    for name_prefix, architecture in configuration_types:
-        key = "{}{}".format(name_prefix, architecture)
+        for name_prefix, architecture in configuration_types:
+            key = "{}{}".format(name_prefix, architecture)
 
-        d[key] = Configuration(
-            key,
-            [
-                Dependency(
-                    "1DE864025F92429BB9855594DBA732B3",
-                    "Common_cpp_MSVC_WindowsKits_10",
-                    architecture,
-                    "https://github.com/davidbrownell/Common_cpp_MSVC_WindowsKits_10.git",
-                ),
-                Dependency(
-                    "67695C1E2C944596AD8390700FAD3E06",
-                    "Common_cpp_Clang_7",
-                    architecture,
-                    "https://github.com/davidbrownell/Common_cpp_Clang_7.git",
-                ),
-            ],
+            d[key] = Configuration(
+                key,
+                [
+                    Dependency(
+                        "1DE864025F92429BB9855594DBA732B3",
+                        "Common_cpp_MSVC_WindowsKits_10",
+                        architecture,
+                        "https://github.com/davidbrownell/Common_cpp_MSVC_WindowsKits_10.git",
+                    ),
+                    Dependency(
+                        "67695C1E2C944596AD8390700FAD3E06",
+                        "Common_cpp_Clang_7",
+                        architecture,
+                        "https://github.com/davidbrownell/Common_cpp_Clang_7.git",
+                    ),
+                ],
+            )
+    else:
+        d["Noop"] = Configuration(
+            "This repository is only supported on Windows",
+            Dependency(
+                "0EAA1DCF22804F90AD9F5A3B85A5D706",
+                "Common_Environment",
+                "python36",
+                "https://github.com/davidbrownell/Common_Environment_v3.git",
+            ),
         )
 
     return d
@@ -166,7 +176,7 @@ def GetCustomActions(debug, verbose, explicit_configurations):
                         ),
                         filename=os.path.join(this_dir, "_Install.7z.001"),
                     ),
-                ),
+                )
             ]
         else:
             remove_install_file = False
@@ -190,7 +200,7 @@ def GetCustomActions(debug, verbose, explicit_configurations):
                     version=version,
                 ),
                 exit_on_error=not remove_install_file,
-            ),
+            )
         ]
 
         if remove_install_file:

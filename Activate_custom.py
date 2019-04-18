@@ -63,7 +63,7 @@ def GetCustomActions(
 
     if configuration.startswith("Clang-"):
         is_clang = True
-        configuration = configuration[len("Clang-"):]
+        configuration = configuration[len("Clang-") :]
     else:
         is_clang = False
 
@@ -115,7 +115,7 @@ def GetCustomActions(
         actions += [CurrentShell.Commands.Call('"{}" {}'.format(vcvarsall_filename, configuration)), CurrentShell.Commands.Message("")]
 
         # Add the debug CRT to the path since it isn't there by default
-        msvc_version = os.path.dirname(msvc_dir) # Remove the OS
+        msvc_version = os.path.dirname(msvc_dir)        # Remove the OS
         msvc_version = os.path.basename(msvc_version)
 
         if msvc_version == "v16.0.0":
@@ -136,7 +136,12 @@ def GetCustomActions(
             assert False, msvc_version
 
         # Add the performance tools to the path
-        perf_tools_dir = ActivationActivity.GetVersionedDirectory(version_specs.Tools, _script_dir, "Tools", "Performance Tools")
+        perf_tools_dir = ActivationActivity.GetVersionedDirectory(
+            version_specs.Tools,
+            _script_dir,
+            "Tools",
+            "Performance Tools",
+        )
         assert os.path.isdir(perf_tools_dir), perf_tools_dir
 
         perf_tools_dir = os.path.join(perf_tools_dir, "Team Tools", "Performance Tools")
@@ -148,11 +153,12 @@ def GetCustomActions(
         actions.append(CurrentShell.Commands.AugmentPath(perf_tools_dir))
 
         # Update the compiler and tester info
-        actions += DynamicPluginArchitecture.CreateRegistrationStatements( "DEVELOPMENT_ENVIRONMENT_TEST_EXECUTORS",
-                                                                           os.path.join(_script_dir, "Scripts", "TestExecutors"),
-                                                                           lambda fullpath, name, ext: ext == ".py" and name.endswith("TestExecutor"),
-                                                                         )
-        
+        actions += DynamicPluginArchitecture.CreateRegistrationStatements(
+            "DEVELOPMENT_ENVIRONMENT_TEST_EXECUTORS",
+            os.path.join(_script_dir, "Scripts", "TestExecutors"),
+            lambda fullpath, name, ext: ext == ".py" and name.endswith("TestExecutor"),
+        )
+
         actions.append(
             CurrentShell.Commands.Augment(
                 "DEVELOPMENT_ENVIRONMENT_TESTER_CONFIGURATIONS",

@@ -15,5 +15,6 @@ REM |  http://www.boost.org/LICENSE_1_0.txt.
 REM |
 REM ----------------------------------------------------------------------
 
+set DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME=MSVC
 set CC=cl
 set CXX=cl

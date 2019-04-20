@@ -99,6 +99,7 @@ def GetCustomActions(
             ]
 
         # Initialize the environment
+        actions.append(CurrentShell.Commands.Set("DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME", "MSVC"))
 
         # Add the compiler tools
         msvc_dir = ActivationActivity.GetVersionedDirectory(

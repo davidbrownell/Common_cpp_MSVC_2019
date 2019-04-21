@@ -99,17 +99,9 @@ def GetDependencies():
     d = OrderedDict()
 
     if CurrentShell.CategoryName == "Windows":
-        configuration_types = [("", "x64"), ("", "x86")]
-
-        # Add clang configurations (this will be in support of clang-cl (where clang
-        # impersonates MSVC))
-        configuration_types += [("Clang-", "x64"), ("Clang-", "x86")]
-
-        for name_prefix, architecture in configuration_types:
-            key = "{}{}".format(name_prefix, architecture)
-
-            d[key] = Configuration(
-                key,
+        for architecture in ["x64", "x86"]:
+            d[architecture] = Configuration(
+                architecture,
                 [
                     Dependency(
                         "1DE864025F92429BB9855594DBA732B3",

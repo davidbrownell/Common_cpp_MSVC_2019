@@ -61,12 +61,6 @@ def GetCustomActions(
     if configuration == "Noop":
         return []
 
-    if configuration.startswith("Clang-"):
-        is_clang = True
-        configuration = configuration[len("Clang-") :]
-    else:
-        is_clang = False
-
     actions = []
 
     if fast:
@@ -99,7 +93,23 @@ def GetCustomActions(
             ]
 
         # Initialize the environment
-        actions.append(CurrentShell.Commands.Set("DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME", "MSVC"))
+        actions += [
+            CurrentShell.Commands.Set("DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME", "MSVC-2019"),
+            CurrentShell.Commands.Set("CXX", "cl"),
+            CurrentShell.Commands.Set("CC", "cl"),
+            CurrentShell.Commands.Augment(
+                "DEVELOPMENT_ENVIRONMENT_TESTER_CONFIGURATIONS",
+                "c++-coverage_executor-MSVCCodeCoverage",
+                update_memory=True,
+            ),
+        ]
+
+        # Update the compiler and tester info
+        actions += DynamicPluginArchitecture.CreateRegistrationStatements(
+            "DEVELOPMENT_ENVIRONMENT_TEST_EXECUTORS",
+            os.path.join(_script_dir, "Scripts", "TestExecutors"),
+            lambda fullpath, name, ext: ext == ".py" and name.endswith("TestExecutor"),
+        )
 
         # Add the compiler tools
         msvc_dir = ActivationActivity.GetVersionedDirectory(
@@ -152,29 +162,6 @@ def GetCustomActions(
         assert os.path.isdir(perf_tools_dir), perf_tools_dir
 
         actions.append(CurrentShell.Commands.AugmentPath(perf_tools_dir))
-
-        # Update the compiler and tester info
-        actions += DynamicPluginArchitecture.CreateRegistrationStatements(
-            "DEVELOPMENT_ENVIRONMENT_TEST_EXECUTORS",
-            os.path.join(_script_dir, "Scripts", "TestExecutors"),
-            lambda fullpath, name, ext: ext == ".py" and name.endswith("TestExecutor"),
-        )
-
-        actions.append(
-            CurrentShell.Commands.Augment(
-                "DEVELOPMENT_ENVIRONMENT_TESTER_CONFIGURATIONS",
-                "c++-coverage_executor-MSVCCodeCoverage",
-                update_memory=True,
-            ),
-        )
-
-    # Set the compiler
-    if is_clang:
-        compiler = "clang-cl"
-    else:
-        compiler = "cl"
-
-    actions += [CurrentShell.Commands.Set("CXX", compiler), CurrentShell.Commands.Set("CC", compiler)]
 
     return actions
 

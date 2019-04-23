@@ -218,7 +218,7 @@ class TestExecutor(TestExecutorImpl):
             )
 
             # ----------------------------------------------------------------------
-            ModuleResult = namedtuple("ModuleResult", ["lines", "covered"])
+            ModuleResult = namedtuple("ModuleResult", ["covered", "not_covered"])
 
             # ----------------------------------------------------------------------
             def Invoke(task_index, output_stream):
@@ -259,8 +259,8 @@ class TestExecutor(TestExecutorImpl):
 
                     # ----------------------------------------------------------------------
 
-                    total_lines = 0
-                    total_covered = 0
+                    covered = 0
+                    not_covered = 0
 
                     with open(temp_filename, "r") as input:
                         reader = csv.reader(input)
@@ -269,23 +269,18 @@ class TestExecutor(TestExecutorImpl):
                             if not isinstance(row, (tuple, list)):
                                 raise Exception(row)
 
-                            method_name, covered, partial, not_covered = row[1:5]
-
+                            method_name = row[1]
                             if not Include(method_name):
                                 continue
 
-                            covered = int(covered)
-                            partial = int(partial)
-                            not_covered = int(not_covered)
+                            covered += int(row[-2])
+                            not_covered += int(row[-1])
 
-                            total_lines += covered + partial + not_covered
-                            total_covered += covered + partial / 2
+                    all_results[task_index] = ModuleResult(covered, not_covered)
 
-                all_results[task_index] = ModuleResult(total_lines, total_covered)
-
-                with nonlocals_lock:
-                    nonlocals.remaining -= 1
-                    on_status_update(status_template.format(nonlocals.remaining))
+                    with nonlocals_lock:
+                        nonlocals.remaining -= 1
+                        on_status_update(status_template.format(nonlocals.remaining))
 
                 return 0
 
@@ -307,22 +302,26 @@ class TestExecutor(TestExecutorImpl):
             # Concatenate the results
             on_status_update("Finalizing Results")
 
-            total_lines = 0
             total_covered = 0
+            total_not_covered = 0
 
             all_percentages = OrderedDict()
 
             for output_name, results in zip(output_names, all_results):
-                total_lines += results.lines
                 total_covered += results.covered
-
+                total_not_covered += results.not_covered
+                
+                result_blocks = results.covered + results.not_covered
+                
                 all_percentages[output_name] = (
-                    (results.covered / results.lines if results.lines else 0.0) * 100.0,
-                    "{} of {} lines covered".format(results.covered, results.lines),
+                    (float(results.covered) / result_blocks if result_blocks else 0.0) * 100.0,
+                    "{} of {} blocks covered".format(results.covered, result_blocks),
                 )
 
+            total_blocks = total_covered + total_not_covered
+
             execute_result.CoverageDataFilename = coverage_output_filename
-            execute_result.CoveragePercentage = (total_covered / total_lines if total_lines else 0.0) * 100.0
+            execute_result.CoveragePercentage = (float(total_covered) / total_blocks if total_blocks else 0.0) * 100.0
             execute_result.CoveragePercentages = all_percentages
 
         # ----------------------------------------------------------------------

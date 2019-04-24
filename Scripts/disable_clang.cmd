@@ -15,6 +15,14 @@ REM |  http://www.boost.org/LICENSE_1_0.txt.
 REM |
 REM ----------------------------------------------------------------------
 
-set DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME=MSVC
+set DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME=MSVC-2019
+
+set CFLAGS=
+set CXXFLAGS=
+
 set CC=cl
 set CXX=cl
+
+echo.
+echo The compiler has been set to '%DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME%'.
+echo.

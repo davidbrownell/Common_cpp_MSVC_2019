@@ -16,5 +16,15 @@ REM |
 REM ----------------------------------------------------------------------
 
 set DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME=Clang-7
+
+if "%DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE%"=="x86" (
+    set CFLAGS=-m32
+    set CXXFLAGS=-m32
+)
+
 set CC=clang-cl
 set CXX=clang-cl
+
+echo.
+echo The compiler has been set to '%DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME%'.
+echo.

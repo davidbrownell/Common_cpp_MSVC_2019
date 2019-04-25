@@ -95,8 +95,6 @@ def GetCustomActions(
         # Initialize the environment
         actions += [
             CurrentShell.Commands.Set("DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME", "MSVC-2019"),
-            CurrentShell.Commands.Set("CXX", "cl"),
-            CurrentShell.Commands.Set("CC", "cl"),
             CurrentShell.Commands.Augment(
                 "DEVELOPMENT_ENVIRONMENT_TESTER_CONFIGURATIONS",
                 "c++-coverage_executor-MSVCCodeCoverage",
@@ -104,13 +102,12 @@ def GetCustomActions(
             ),
         ]
 
-        # Update the compiler and tester info
         actions += DynamicPluginArchitecture.CreateRegistrationStatements(
             "DEVELOPMENT_ENVIRONMENT_TEST_EXECUTORS",
             os.path.join(_script_dir, "Scripts", "TestExecutors"),
             lambda fullpath, name, ext: ext == ".py" and name.endswith("TestExecutor"),
         )
-
+    
         # Add the compiler tools
         msvc_dir = ActivationActivity.GetVersionedDirectory(
             version_specs.Tools,

@@ -27,7 +27,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 _CUSTOM_DATA                                = [
     (
         "MSVC - 16.0.0",
-        "BFBAA1DCD06618C95BA6A6C5179343BE35D6D9433DDC5E1B2172C602C891EFAB",
+        "bfbaa1dcd06618c95ba6a6c5179343be35d6d9433ddc5e1b2172c602c891efab",
         [
             "Tools",
             "MSVC",
@@ -37,7 +37,7 @@ _CUSTOM_DATA                                = [
     ),
     (
         "Visual Studio Performance Tools - 16.0.0",
-        "94470CBF0B5914BF30FF1377ED1F8F3F96098E596853B14C0A441C4513D41F93",
+        "94470cbf0b5914bf30ff1377ed1f8f3f96098e596853b14c0a441c4513d41f93",
         [
             "Tools",
             "Performance Tools",

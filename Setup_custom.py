@@ -102,20 +102,7 @@ def GetDependencies():
         for architecture in ["x64", "x86"]:
             d[architecture] = Configuration(
                 architecture,
-                [
-                    Dependency(
-                        "1DE864025F92429BB9855594DBA732B3",
-                        "Common_cpp_MSVC_WindowsKits_10",
-                        architecture,
-                        "https://github.com/davidbrownell/Common_cpp_MSVC_WindowsKits_10.git",
-                    ),
-                    Dependency(
-                        "67695C1E2C944596AD8390700FAD3E06",
-                        "Common_cpp_Clang_7",
-                        architecture,
-                        "https://github.com/davidbrownell/Common_cpp_Clang_7.git",
-                    ),
-                ],
+                [Dependency("DFF6D15FA5484824B42341F415BD0594", "Common_cpp_MSVC_Common", architecture, "https://github.com/davidbrownell/Common_cpp_MSVC_Common.git")],
             )
     else:
         d["Noop"] = Configuration(
@@ -171,7 +158,7 @@ def GetCustomActions(debug, verbose, explicit_configurations):
         # Install the file
         actions += [
             CurrentShell.Commands.Execute(
-                'python "{script}" Install "{name}" "{uri}" "{dir}" "{version}"'.format(
+                'python "{script}" Install "{name}" "{uri}" "{dir}" "/unique_id={version}" /unique_id_is_hash'.format(
                     script=os.path.join(
                         os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"),
                         "RepositoryBootstrap",

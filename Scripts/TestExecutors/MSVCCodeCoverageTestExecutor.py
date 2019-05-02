@@ -35,7 +35,7 @@ class TestExecutor(TestExecutorImpl):
     # |  Properties
     Name                                    = Interface.DerivedProperty("MSVCCodeCoverage")
     Description                             = Interface.DerivedProperty(
-        "Extracts Code Coverage information using MSVC Performance Tools.",
+        "Extracts code coverage information using MSVC Performance Tools.",
     )
 
     # ----------------------------------------------------------------------

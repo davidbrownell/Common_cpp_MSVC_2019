@@ -89,7 +89,6 @@ def GetCustomActions(
                         version=version,
                     ),
                 ),
-                CurrentShell.Commands.Message(""),
             ]
 
         # Initialize the environment
@@ -120,7 +119,11 @@ def GetCustomActions(
         vcvarsall_filename = os.path.join(msvc_dir, "VC", "Auxiliary", "Build", "vcvarsall.bat")
         assert os.path.isfile(vcvarsall_filename), vcvarsall_filename
 
-        actions += [CurrentShell.Commands.Call('"{}" {}'.format(vcvarsall_filename, configuration)), CurrentShell.Commands.Message("")]
+        actions += [
+            CurrentShell.Commands.Message(""),
+            CurrentShell.Commands.Call('"{}" {}'.format(vcvarsall_filename, configuration)),
+            CurrentShell.Commands.Message(""),
+        ]
 
         # Add the debug CRT to the path since it isn't there by default
         msvc_version = os.path.dirname(msvc_dir)        # Remove the OS

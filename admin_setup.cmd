@@ -16,13 +16,24 @@ REM |
 REM ----------------------------------------------------------------------
 REM Setup activites that require admin access
 
-regsvr32 /s "%~dp0Tools\Performance Tools\v16.0.0\Windows\Team Tools\Performance Tools\msdia140.dll"
+if "%1"=="" (
+    echo.
+    echo ERROR: Usage - %0 ^<Environment Name^>
+    echo.
+    exit /B -1
+)
+
+regsvr32 /s "%~dp0Tools\Performance Tools\v16.0.0\Windows\%1\Team Tools\Performance Tools\msdia140.dll"
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Unable to register "%~dp0Tools\Performance Tools\v16.0.0\Windows\Team Tools\Performance Tools\msdia140.dll"
+    echo ERROR: Unable to register "%~dp0Tools\Performance Tools\v16.0.0\Windows\%1\Team Tools\Performance Tools\msdia140.dll"
     exit /B %ERRORLEVEL%
 )
 
-echo This file is used to communicate that admin_setup has been run and completed successfully. Please do not remove this file, as it will cause other tools to prompt you to run admin_setup.cmd again. > "%~dp0admin_setup.complete"
+(
+echo This file is used to communicate that admin_setup has been run and completed successfully. Please do not remove this file, as it will cause other tools to prompt you to run admin_setup.cmd again.
+echo.
+echo %~dp0Tools\Performance Tools\v16.0.0\Windows\%1\Team Tools\Performance Tools\msdia140.dll
+) > "%~dp0admin_setup.complete"
 
 echo.
 echo.

@@ -52,7 +52,25 @@ class TestExecutor(TestExecutorImpl):
         # This code uses a COM object that must be registered. Unfortunately,
         # this registration requires admin access. Provide instructions if these
         # activities have not yet been completed.
-        if not os.path.isfile(os.path.join(repo_root, "admin_setup.complete")):
+
+        # ----------------------------------------------------------------------
+        def IsAdminSetupComplete():
+            filename = os.path.join(repo_root, "admin_setup.complete")
+            
+            if not os.path.isfile(filename):
+                return False
+
+            with open(filename) as f:
+                content = f.read().strip()
+
+            if not os.path.isfile(content.split("\n")[-1]):
+                return False
+
+            return True
+
+        # ----------------------------------------------------------------------
+
+        if not IsAdminSetupComplete():
             raise Exception(
                 textwrap.dedent(
                     """\

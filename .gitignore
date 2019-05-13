@@ -3,14 +3,20 @@ __pycache__
 *.pyo
 
 Generated/*
+
 Activate.cmd
+Activate.*.cmd
 Activate.ps1
+Activate.*.ps1
 Activate.sh
+Activate.*.sh
 
 .coverage
 coverage.xml
 
-Tools/MSVC/v16.0.0/Windows/*
-Tools/Performance Tools/v16.0.0/Windows/*
+.vscode/*
 
 admin_setup.complete
+
+Tools/MSVC/v16.0.0/Windows/*
+Tools/Performance Tools/v16.0.0/Windows/*

@@ -96,7 +96,6 @@ def GetCustomActions(
                 CurrentShell.Commands.Augment(
                     "DEVELOPMENT_ENVIRONMENT_TESTER_CONFIGURATIONS",
                     "c++-coverage_executor-MSVCCodeCoverage",
-                    update_memory=True,
                 ),
             ]
 

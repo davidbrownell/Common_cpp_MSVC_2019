@@ -16,9 +16,15 @@
 
 import os
 import sys
+import textwrap
+import uuid
 
 sys.path.insert(0, os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"))
-from RepositoryBootstrap.SetupAndActivate import CommonEnvironment, CurrentShell, DynamicPluginArchitecture
+from RepositoryBootstrap.SetupAndActivate import (
+    CommonEnvironment,
+    CurrentShell,
+    DynamicPluginArchitecture,
+)
 from RepositoryBootstrap.Impl.ActivationActivity import ActivationActivity
 
 del sys.path[0]
@@ -63,7 +69,9 @@ def GetCustomActions(
     if fast:
         actions.append(
             CurrentShell.Commands.Message(
-                "** FAST: Activating without verifying content. ({})".format(_script_fullpath),
+                "** FAST: Activating without verifying content. ({})".format(
+                    _script_fullpath,
+                ),
             ),
         )
     else:
@@ -92,7 +100,10 @@ def GetCustomActions(
         if configuration != "noop":
             # Initialize the environment
             actions += [
-                CurrentShell.Commands.Set("DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME", "MSVC-2019"),
+                CurrentShell.Commands.Set(
+                    "DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME",
+                    "MSVC-2019",
+                ),
                 CurrentShell.Commands.Augment(
                     "DEVELOPMENT_ENVIRONMENT_TESTER_CONFIGURATIONS",
                     "c++-coverage_executor-MSVCCodeCoverage",
@@ -102,7 +113,8 @@ def GetCustomActions(
             actions += DynamicPluginArchitecture.CreateRegistrationStatements(
                 "DEVELOPMENT_ENVIRONMENT_TEST_EXECUTORS",
                 os.path.join(_script_dir, "Scripts", "TestExecutors"),
-                lambda fullpath, name, ext: ext == ".py" and name.endswith("TestExecutor"),
+                lambda fullpath, name, ext: ext == ".py"
+                and name.endswith("TestExecutor"),
             )
 
             # Add the compiler tools
@@ -114,13 +126,39 @@ def GetCustomActions(
             )
             assert os.path.isdir(msvc_dir), msvc_dir
 
-            vcvarsall_filename = os.path.join(msvc_dir, "VC", "Auxiliary", "Build", "vcvarsall.bat")
+            vcvarsall_filename = os.path.join(
+                msvc_dir,
+                "VC",
+                "Auxiliary",
+                "Build",
+                "vcvarsall.bat",
+            )
             assert os.path.isfile(vcvarsall_filename), vcvarsall_filename
 
             actions += [
                 CurrentShell.Commands.Message(""),
-                CurrentShell.Commands.Call('"{}" {}'.format(vcvarsall_filename, configuration)),
+                CurrentShell.Commands.Call(
+                    '"{}" {}'.format(vcvarsall_filename, configuration),
+                ),
                 CurrentShell.Commands.Message(""),
+            ]
+
+            # Set CXX and CC
+            temp_filename = "{}.txt".format(str(uuid.uuid4()).replace("-", ""))
+
+            actions += [
+                CurrentShell.Commands.Raw(
+                    textwrap.dedent(
+                        """\
+                        where cl.exe > "{filename}"
+                        set /p CXX= < "{filename}"
+                        set CC=%CXX%
+                        del "{filename}"
+                        """,
+                    ).format(
+                        filename=temp_filename,
+                    ),
+                ),
             ]
 
             # Add the debug CRT to the path since it isn't there by default
@@ -150,13 +188,63 @@ def GetCustomActions(
             )
             assert os.path.isdir(perf_tools_dir), perf_tools_dir
 
-            perf_tools_dir = os.path.join(perf_tools_dir, "Team Tools", "Performance Tools")
+            perf_tools_dir = os.path.join(
+                perf_tools_dir,
+                "Team Tools",
+                "Performance Tools",
+            )
             if configuration == "x64":
                 perf_tools_dir = os.path.join(perf_tools_dir, "x64")
 
             assert os.path.isdir(perf_tools_dir), perf_tools_dir
 
             actions.append(CurrentShell.Commands.AugmentPath(perf_tools_dir))
+
+            # Additional setup
+            if not os.path.isfile(os.path.join(_script_dir, "admin_setup.complete")):
+                actions.append(
+                    CurrentShell.Commands.Message(
+                        "\n".join(
+                            [
+                                "        {}".format(line) for line in textwrap.dedent(
+                                    """\
+
+                                    # ----------------------------------------------------------------------
+                                    # ----------------------------------------------------------------------
+
+                                    WARNING ({}):
+
+                                    This repository includes setup activities that must be run as an administrator.
+                                    This additional setup is not required for all development activities, but is required
+                                    for the following:
+
+                                        - Code coverage extraction and analysis
+                                        - For external tools that use 'vswhere.exe' to detect MSVC compiler instances
+
+                                    This warning is otherwise safe to ignore.
+
+                                    To complete these optional setup activities:
+
+                                        1) Launch a command prompt with administrator rights:
+                                            - Windows Key
+                                            - Type "cmd"
+                                            - Right click and select "Run as Administrator"
+
+                                        2) Run "{} {}"
+
+                                    # ----------------------------------------------------------------------
+                                    # ----------------------------------------------------------------------
+
+                                    """,
+                                ).format(
+                                    _script_dir,
+                                    os.path.join(_script_dir, "admin_setup.cmd"),
+                                    os.getenv("DEVELOPMENT_ENVIRONMENT_ENVIRONMENT_NAME"),
+                                ).split("\n")
+                            ],
+                        ),
+                    ),
+                )
 
     return actions
 

@@ -29,10 +29,19 @@ if %ERRORLEVEL% NEQ 0 (
     exit /B %ERRORLEVEL%
 )
 
+if not exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer" mkdir "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer"
+copy /B /Y ".\Tools\vswhere\v2.8.4-fork\Windows\vswhere.exe" "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+if %ERRORLEVEL% NEQ 0 (
+    echo ERROR: Unable to copy vswhere.exe
+    exit /B %ERRORLEVEL%
+)
+
 (
 echo This file is used to communicate that admin_setup has been run and completed successfully. Please do not remove this file, as it will cause other tools to prompt you to run admin_setup.cmd again.
 echo.
-echo %~dp0Tools\Performance Tools\v16.0.0\Windows\%1\Team Tools\Performance Tools\msdia140.dll
+echo     - "%~dp0Tools\Performance Tools\v16.0.0\Windows\%1\Team Tools\Performance Tools\msdia140.dll"
+echo     - "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+echo.
 ) > "%~dp0admin_setup.complete"
 
 echo.

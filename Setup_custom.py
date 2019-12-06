@@ -102,12 +102,26 @@ def GetDependencies():
         for architecture in ["x64", "x86"]:
             d[architecture] = Configuration(
                 architecture,
-                [Dependency("DFF6D15FA5484824B42341F415BD0594", "Common_cpp_MSVC_Common", architecture, "https://github.com/davidbrownell/Common_cpp_MSVC_Common.git")],
+                [
+                    Dependency(
+                        "DFF6D15FA5484824B42341F415BD0594",
+                        "Common_cpp_MSVC_Common",
+                        architecture,
+                        "https://github.com/davidbrownell/Common_cpp_MSVC_Common.git",
+                    )
+                ],
             )
 
     d["noop"] = Configuration(
         "Configuration that doesn't do anything; this is useful on non-Windows machines or in Bootstrap repositories (where different versions of MSVC conflict with each other (normally, MSVC repositories are mutually exclusive))",
-        [Dependency("0EAA1DCF22804F90AD9F5A3B85A5D706", "Common_Environment", "python36", "https://github.com/davidbrownell/Common_Environment_v3.git")],
+        [
+            Dependency(
+                "0EAA1DCF22804F90AD9F5A3B85A5D706",
+                "Common_Environment",
+                "python36",
+                "https://github.com/davidbrownell/Common_Environment_v3.git",
+            )
+        ],
     )
 
     return d
@@ -139,43 +153,38 @@ def GetCustomActions(debug, verbose, explicit_configurations):
         if not os.path.isfile(install_filename):
             remove_install_file = True
 
-            actions += [
-                CurrentShell.Commands.Execute(
-                    'python "{script}" Reconstruct "{filename}"'.format(
-                        script=os.path.join(
-                            os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"),
-                            "RepositoryBootstrap",
-                            "SetupAndActivate",
-                            "LargeFileSupport.py",
-                        ),
-                        filename=os.path.join(this_dir, "_Install.7z.001"),
-                    ),
-                )
-            ]
-        else:
-            remove_install_file = False
-
-        # Install the file
-        actions += [
-            CurrentShell.Commands.Execute(
-                'python "{script}" Install "{name}" "{uri}" "{dir}" "/unique_id={version}" /unique_id_is_hash'.format(
+            actions += [CurrentShell.Commands.Execute(
+                'python "{script}" Reconstruct "{filename}"'.format(
                     script=os.path.join(
                         os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"),
                         "RepositoryBootstrap",
                         "SetupAndActivate",
-                        "AcquireBinaries.py",
+                        "LargeFileSupport.py",
                     ),
-                    name=name,
-                    uri=CommonEnvironmentImports.FileSystem.FilenameToUri(install_filename).replace(
-                        "%",
-                        "%%",
-                    ),
-                    dir=this_dir,
-                    version=version,
+                    filename=os.path.join(this_dir, "_Install.7z.001"),
                 ),
-                exit_on_error=not remove_install_file,
-            )
-        ]
+            )]
+        else:
+            remove_install_file = False
+
+        # Install the file
+        actions += [CurrentShell.Commands.Execute(
+            'python "{script}" Install "{name}" "{uri}" "{dir}" "/unique_id={version}" /unique_id_is_hash'.format(
+                script=os.path.join(
+                    os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"),
+                    "RepositoryBootstrap",
+                    "SetupAndActivate",
+                    "AcquireBinaries.py",
+                ),
+                name=name,
+                uri=CommonEnvironmentImports.FileSystem.FilenameToUri(
+                    install_filename,
+                ).replace("%", "%%"),
+                dir=this_dir,
+                version=version,
+            ),
+            exit_on_error=not remove_install_file,
+        )]
 
         if remove_install_file:
             actions += [
@@ -185,5 +194,34 @@ def GetCustomActions(debug, verbose, explicit_configurations):
                     variable_name="_setup_error",
                 ),
             ]
+
+    # The following actions install additional content in existing dirs. I didn't
+    # want to create an entirely new install just to add these augmentations.
+    msvc_16_0_0_dir = os.path.join(_script_dir, "Tools", "MSVC", "v16.0.0", "Windows")
+
+    actions += [
+        CurrentShell.Commands.Execute(
+            'python "{script}" Install "ATL/MFC Augmentation - 16.0.0" "{uri}" "{dir}" "/unique_id=e3b9ac4e783d048c3c788954e98339b2411df29e9cabdbea40ac414106f9ab5a" /unique_id_is_hash /no_output_dir_decoration'.format(
+                script=os.path.join(
+                    os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"),
+                    "RepositoryBootstrap",
+                    "SetupAndActivate",
+                    "AcquireBinaries.py",
+                ),
+                uri=CommonEnvironmentImports.FileSystem.FilenameToUri(
+                    os.path.join(msvc_16_0_0_dir, "atlmfc.7z"),
+                ),
+                dir=os.path.join(
+                    msvc_16_0_0_dir,
+                    os.getenv("DEVELOPMENT_ENVIRONMENT_ENVIRONMENT_NAME"),
+                    "VC",
+                    "Tools",
+                    "MSVC",
+                    "14.20.27508",
+                    "atlmfc",
+                ),
+            ),
+        ),
+    ]
 
     return actions

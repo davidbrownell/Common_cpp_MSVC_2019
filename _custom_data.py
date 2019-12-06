@@ -44,5 +44,5 @@ _CUSTOM_DATA                                = [
             "v16.0.0",
             "Windows",
         ],
-    ), 
+    ),
 ]

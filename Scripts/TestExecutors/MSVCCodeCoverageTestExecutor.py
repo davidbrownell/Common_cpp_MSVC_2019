@@ -46,7 +46,7 @@ class TestExecutor(TestExecutorImpl):
         result = super(TestExecutor, cls).ValidateEnvironment()
         if result is not None:
             return result
-        
+
         repo_root = os.path.realpath(os.path.join(_script_dir, "..", ".."))
 
         # This code uses a COM object that must be registered. Unfortunately,
@@ -55,18 +55,7 @@ class TestExecutor(TestExecutorImpl):
 
         # ----------------------------------------------------------------------
         def IsAdminSetupComplete():
-            filename = os.path.join(repo_root, "admin_setup.complete")
-            
-            if not os.path.isfile(filename):
-                return False
-
-            with open(filename) as f:
-                content = f.read().strip()
-
-            if not os.path.isfile(content.split("\n")[-1]):
-                return False
-
-            return True
+            return os.path.isfile(os.path.join(repo_root, "admin_setup.complete"))
 
         # ----------------------------------------------------------------------
 

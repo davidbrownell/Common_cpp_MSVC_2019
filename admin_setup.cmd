@@ -30,7 +30,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 if not exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer" mkdir "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer"
-copy /B /Y ".\Tools\vswhere\v2.8.4-fork\Windows\vswhere.exe" "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+copy /B /Y "%~dp0Tools\vswhere\v2.8.4-fork\Windows\vswhere.exe" "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" > nul
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Unable to copy vswhere.exe
     exit /B %ERRORLEVEL%

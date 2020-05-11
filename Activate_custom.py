@@ -250,6 +250,25 @@ def GetCustomActions(
 
 
 # ----------------------------------------------------------------------
+def GetCustomActionsEpilogue(
+    output_stream,
+    configuration,
+    version_specs,
+    generated_dir,
+    debug,
+    verbose,
+    fast,
+    repositories,
+    is_mixin_repo,
+):
+    actions = []
+
+    actions += [CurrentShell.Commands.Set("DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME", "MSVC-2019")]
+
+    return actions
+
+
+# ----------------------------------------------------------------------
 def GetCustomScriptExtractors():
     """
     Returns information that can be used to enumerate, extract, and generate documentation

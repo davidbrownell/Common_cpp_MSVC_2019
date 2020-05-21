@@ -56,24 +56,26 @@ else:
         # ----------------------------------------------------------------------
         # ----------------------------------------------------------------------
         def _TestImpl(self, configuration):
-            with _BuildGenerator(
-                os.path.join(
-                    os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_COMMON_ROOT"),
-                    "src",
-                    "CmakeLocalEndToEndTestsImpl",
-                    "lib",
-                ),
-                configuration,
-            ) as (temp_dir, result, output):
-                self.assertTrue(
-                    result == 0,
-                    msg=output,
-                )
+            for test_type in ["standard", "build_helper"]:
+                with _BuildGenerator(
+                    os.path.join(
+                        os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_COMMON_ROOT"),
+                        "src",
+                        "CmakeLocalEndToEndTestsImpl",
+                        test_type,
+                        "lib",
+                    ),
+                    configuration,
+                ) as (temp_dir, result, output):
+                    self.assertTrue(
+                        result == 0,
+                        msg=output,
+                    )
 
-                self.assertTrue(
-                    os.path.isfile(os.path.join(temp_dir, "Lib.lib"))
-                    or os.path.isfile(os.path.join(temp_dir, "Lib.a")),
-                )
+                    self.assertTrue(
+                        os.path.isfile(os.path.join(temp_dir, "Lib.lib"))
+                        or os.path.isfile(os.path.join(temp_dir, "Lib.a")),
+                    )
 
     # ----------------------------------------------------------------------
     class ExeSuite(unittest.TestCase):
@@ -89,36 +91,38 @@ else:
         # ----------------------------------------------------------------------
         # ----------------------------------------------------------------------
         def _TestImpl(self, configuration):
-            with _BuildGenerator(
-                os.path.join(
-                    os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_COMMON_ROOT"),
-                    "src",
-                    "CmakeLocalEndToEndTestsImpl",
-                    "exe",
-                ),
-                configuration,
-            ) as (temp_dir, result, output):
-                self.assertTrue(
-                    result == 0,
-                    msg=output,
-                )
+            for test_type in ["standard", "build_helper"]:
+                with _BuildGenerator(
+                    os.path.join(
+                        os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_COMMON_ROOT"),
+                        "src",
+                        "CmakeLocalEndToEndTestsImpl",
+                        test_type,
+                        "exe",
+                    ),
+                    configuration,
+                ) as (temp_dir, result, output):
+                    self.assertTrue(
+                        result == 0,
+                        msg=output,
+                    )
 
-                found = False
+                    found = False
 
-                for potential_exe_name in ["Exe", "Exe.exe"]:
-                    exe_name = os.path.join(temp_dir, potential_exe_name)
-                    if os.path.isfile(exe_name):
-                        found = True
+                    for potential_exe_name in ["Exe", "Exe.exe"]:
+                        exe_name = os.path.join(temp_dir, potential_exe_name)
+                        if os.path.isfile(exe_name):
+                            found = True
 
-                        result, output = Process.Execute("{} --success".format(exe_name))
-                        self.assertTrue(
-                            result == 0,
-                            msg=output,
-                        )
+                            result, output = Process.Execute("{} --success".format(exe_name))
+                            self.assertTrue(
+                                result == 0,
+                                msg=output,
+                            )
 
-                        break
+                            break
 
-                self.assertTrue(found)
+                    self.assertTrue(found)
 
     # ----------------------------------------------------------------------
     class SharedSuite(unittest.TestCase):
@@ -134,24 +138,26 @@ else:
         # ----------------------------------------------------------------------
         # ----------------------------------------------------------------------
         def _TestImpl(self, configuration):
-            with _BuildGenerator(
-                os.path.join(
-                    os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_COMMON_ROOT"),
-                    "src",
-                    "CmakeLocalEndToEndTestsImpl",
-                    "shared",
-                ),
-                configuration,
-            ) as (temp_dir, result, output):
-                self.assertTrue(
-                    result == 0,
-                    msg=output,
-                )
+            for test_type in ["standard", "build_helper"]:
+                with _BuildGenerator(
+                    os.path.join(
+                        os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_COMMON_ROOT"),
+                        "src",
+                        "CmakeLocalEndToEndTestsImpl",
+                        test_type,
+                        "shared",
+                    ),
+                    configuration,
+                ) as (temp_dir, result, output):
+                    self.assertTrue(
+                        result == 0,
+                        msg=output,
+                    )
 
-                self.assertTrue(
-                    os.path.isfile(os.path.join(temp_dir, "Shared.dll"))
-                    or os.path.isfile(os.path.join(temp_dir, "Shared.so")),
-                )
+                    self.assertTrue(
+                        os.path.isfile(os.path.join(temp_dir, "Shared.dll"))
+                        or os.path.isfile(os.path.join(temp_dir, "Shared.so")),
+                    )
 
     # ----------------------------------------------------------------------
     class SharedExeSuite(unittest.TestCase):
@@ -167,36 +173,38 @@ else:
         # ----------------------------------------------------------------------
         # ----------------------------------------------------------------------
         def _TestImpl(self, configuration):
-            with _BuildGenerator(
-                os.path.join(
-                    os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_COMMON_ROOT"),
-                    "src",
-                    "CmakeLocalEndToEndTestsImpl",
-                    "shared_exe",
-                ),
-                configuration,
-            ) as (temp_dir, result, output):
-                self.assertTrue(
-                    result == 0,
-                    msg=output,
-                )
+            for test_type in ["standard", "build_helper"]:
+                with _BuildGenerator(
+                    os.path.join(
+                        os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_COMMON_ROOT"),
+                        "src",
+                        "CmakeLocalEndToEndTestsImpl",
+                        test_type,
+                        "shared_exe",
+                    ),
+                    configuration,
+                ) as (temp_dir, result, output):
+                    self.assertTrue(
+                        result == 0,
+                        msg=output,
+                    )
 
-                found = False
+                    found = False
 
-                for potential_exe_name in ["SharedExe", "SharedExe.exe"]:
-                    exe_name = os.path.join(temp_dir, potential_exe_name)
-                    if os.path.isfile(exe_name):
-                        found = True
+                    for potential_exe_name in ["SharedExe", "SharedExe.exe"]:
+                        exe_name = os.path.join(temp_dir, potential_exe_name)
+                        if os.path.isfile(exe_name):
+                            found = True
 
-                        result, output = Process.Execute("{} --success".format(exe_name))
-                        self.assertTrue(
-                            result == 0,
-                            msg=output,
-                        )
+                            result, output = Process.Execute("{} --success".format(exe_name))
+                            self.assertTrue(
+                                result == 0,
+                                msg=output,
+                            )
 
-                        break
+                            break
 
-                self.assertTrue(found)
+                    self.assertTrue(found)
 
     # ----------------------------------------------------------------------
     # ----------------------------------------------------------------------
